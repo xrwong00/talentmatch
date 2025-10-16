@@ -564,9 +564,9 @@ export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerM
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white text-3xl font-bold mb-6 shadow-lg shadow-emerald-500/25">
               🧠
             </div>
-            <h2 className="text-2xl sm:text-3xl font-bold mb-3">Discover Your Career Path</h2>
+            <h2 className="text-2xl sm:text-3xl font-bold mb-3">Map Your 5-Year Career</h2>
             <p className="text-black/70 dark:text-white/70 max-w-2xl mx-auto">
-              Take 3 minutes to reflect on your experience, skills, and strengths. Once ready, share your thoughts — either by typing or speaking.
+              Take 3 minutes to reflect on your skills, interests, and goals. AI will analyze your profile and predict your complete career progression.
             </p>
             <div className="mt-8">
               <div className="text-6xl font-bold text-emerald-600 mb-2">{formatTime(timeLeft)}</div>
@@ -585,9 +585,9 @@ export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerM
 
         {phase === "choose" && (
           <div className="text-center">
-            <h3 className="text-xl sm:text-2xl font-bold mb-4">How would you like to share?</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-4">How would you like to share your profile?</h3>
             <p className="text-black/70 dark:text-white/70 max-w-2xl mx-auto mb-6">
-              Choose to speak or type your reflection. We will analyze it to predict your most suitable career paths and map your progression.
+              Type or speak your skills, interests, and goals. AI will analyze your profile and create your personalized 5-year career map.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <button
@@ -608,9 +608,9 @@ export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerM
 
         {phase === "type" && (
           <div>
-            <h3 className="text-xl sm:text-2xl font-bold mb-3">Type your reflection</h3>
+            <h3 className="text-xl sm:text-2xl font-bold mb-3">Share your profile</h3>
             <p className="text-black/70 dark:text-white/70 mb-4">
-              For example: “I am an engineering student skilled in soldering, circuit design, and embedded systems. I enjoy IoT projects and want a hardware role.”
+              Example: "I'm an engineering student skilled in circuit design and embedded systems. I enjoy IoT projects and want to work in hardware development."
             </p>
             <textarea
               value={inputText}
@@ -632,8 +632,8 @@ export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerM
 
         {phase === "speak" && (
           <div>
-            <h3 className="text-xl sm:text-2xl font-bold mb-3">Speak your reflection</h3>
-            <p className="text-black/70 dark:text-white/70 mb-4">Click record and share your skills, interests, and aspirations.</p>
+            <h3 className="text-xl sm:text-2xl font-bold mb-3">Speak your profile</h3>
+            <p className="text-black/70 dark:text-white/70 mb-4">Click record and share your skills, interests, and career goals.</p>
             <div className="rounded-2xl border border-black/10 dark:border-white/20 p-4 bg-black/5 dark:bg-white/5 min-h-[96px]">
               <div className="text-sm opacity-80 whitespace-pre-wrap">{transcript || "Your speech will appear here..."}</div>
             </div>
