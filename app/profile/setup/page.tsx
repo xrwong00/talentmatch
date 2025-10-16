@@ -153,9 +153,9 @@ export default function ProfileSetup() {
         {/* Form Content */}
         <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6 sm:p-8 mb-6">
           <h2 className="text-2xl font-bold mb-6">{steps[currentStep - 1]?.title}</h2>
-          {CurrentStepComponent && (
+          {CurrentStepComponent && user?.id && (
             <CurrentStepComponent
-              userId={user?.id}
+              userId={user.id}
               onNext={handleNext}
               onPrevious={handlePrevious}
               isFirstStep={currentStep === 1}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import CareerAgentChat from "@/app/components/CareerAgentChat";
 
 type Job = {
   id: string;
@@ -30,76 +31,68 @@ export default function Dashboard() {
   const [locationFilter, setLocationFilter] = useState("");
   const [jobTypeFilter, setJobTypeFilter] = useState("");
   const [profile, setProfile] = useState<any>(null);
+  const [showAIAgent, setShowAIAgent] = useState(false);
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
+  const [appliedJobIds, setAppliedJobIds] = useState<Set<string>>(new Set());
+  const [applicationCount, setApplicationCount] = useState(0);
+  const [savedJobCount, setSavedJobCount] = useState(0);
 
-  // Mock job data - In production, this would come from your database
-  const [jobs] = useState<Job[]>([
-    {
-      id: "1",
-      title: "Senior Software Engineer",
-      company: "Tech Innovation Sdn Bhd",
-      location: "Kuala Lumpur",
-      type: "Full-time",
-      salary: "RM 8,000 - RM 12,000",
-      posted: "2 days ago",
-      description: "We're looking for an experienced software engineer to join our growing team...",
-      tags: ["React", "Node.js", "TypeScript", "AWS"],
-    },
-    {
-      id: "2",
-      title: "Frontend Developer",
-      company: "Digital Solutions Malaysia",
-      location: "Petaling Jaya",
-      type: "Full-time",
-      salary: "RM 5,000 - RM 8,000",
-      posted: "1 day ago",
-      description: "Join our team to build amazing user experiences with modern web technologies...",
-      tags: ["React", "Vue.js", "CSS", "JavaScript"],
-    },
-    {
-      id: "3",
-      title: "Backend Engineer",
-      company: "StartUp Hub KL",
-      location: "Kuala Lumpur",
-      type: "Full-time",
-      salary: "RM 6,000 - RM 10,000",
-      posted: "3 days ago",
-      description: "Help us build scalable backend systems for our growing platform...",
-      tags: ["Python", "Django", "PostgreSQL", "Docker"],
-    },
-    {
-      id: "4",
-      title: "UX/UI Designer",
-      company: "Creative Agency Sdn Bhd",
-      location: "Penang",
-      type: "Full-time",
-      salary: "RM 4,500 - RM 7,000",
-      posted: "4 days ago",
-      description: "Create beautiful and intuitive designs for web and mobile applications...",
-      tags: ["Figma", "Adobe XD", "UI Design", "Prototyping"],
-    },
-    {
-      id: "5",
-      title: "DevOps Engineer",
-      company: "Cloud Systems Malaysia",
-      location: "Cyberjaya",
-      type: "Full-time",
-      salary: "RM 7,000 - RM 11,000",
-      posted: "5 days ago",
-      description: "Manage and improve our cloud infrastructure and deployment pipelines...",
-      tags: ["AWS", "Kubernetes", "CI/CD", "Terraform"],
-    },
-    {
-      id: "6",
-      title: "Data Analyst",
-      company: "Analytics Corp",
-      location: "Kuala Lumpur",
-      type: "Contract",
-      salary: "RM 5,500 - RM 8,500",
-      posted: "1 week ago",
-      description: "Analyze data to provide insights and support business decisions...",
-      tags: ["Python", "SQL", "Power BI", "Excel"],
-    },
-  ]);
+  function formatPostedAgo(dateString: string | null): string {
+    if (!dateString) return "";
+    const postedDate = new Date(dateString);
+    const now = new Date();
+    const diffMs = now.getTime() - postedDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    if (diffDays === 0) return "Today";
+    if (diffDays === 1) return "1 day ago";
+    if (diffDays < 7) return `${diffDays} days ago`;
+    const diffWeeks = Math.floor(diffDays / 7);
+    if (diffWeeks === 1) return "1 week ago";
+    return `${diffWeeks} weeks ago`;
+  }
+
+  async function handleSaveJob(jobId: string) {
+    if (!user) return;
+
+    try {
+      const isSaved = savedJobIds.has(jobId);
+
+      if (isSaved) {
+        // Unsave job
+        const { error } = await supabase
+          .from('saved_jobs')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('job_id', jobId);
+
+        if (error) throw error;
+
+        setSavedJobIds(prev => {
+          const newSet = new Set(prev);
+          newSet.delete(jobId);
+          return newSet;
+        });
+        setSavedJobCount(prev => prev - 1);
+      } else {
+        // Save job
+        const { error } = await supabase
+          .from('saved_jobs')
+          .insert({
+            user_id: user.id,
+            job_id: jobId
+          });
+
+        if (error) throw error;
+
+        setSavedJobIds(prev => new Set([...prev, jobId]));
+        setSavedJobCount(prev => prev + 1);
+      }
+    } catch (error: any) {
+      console.error('Error saving job:', error);
+      alert("Failed to save job. Please try again.");
+    }
+  }
 
   useEffect(() => {
     setIsClient(true);
@@ -121,7 +114,62 @@ export default function Dashboard() {
         if (profileData) {
           setProfile(profileData);
         }
-        
+
+        // Load jobs from DB (with company join) - only active jobs
+        const { data: jobsData } = await supabase
+          .from('jobs')
+          .select('id,title,location,employment_type,salary,description,tags,posted_at,companies(name),is_active')
+          .eq('is_active', true)
+          .order('posted_at', { ascending: false });
+
+        if (Array.isArray(jobsData)) {
+          // Create a map to track unique jobs by id to prevent duplicates
+          const uniqueJobsMap = new Map();
+          
+          jobsData.forEach((j: any) => {
+            if (!uniqueJobsMap.has(j.id)) {
+              uniqueJobsMap.set(j.id, {
+                id: j.id,
+                title: j.title,
+                company: j.companies?.name || '',
+                location: j.location || '',
+                type: j.employment_type || '',
+                salary: j.salary || '',
+                posted: formatPostedAgo(j.posted_at),
+                description: j.description || '',
+                tags: Array.isArray(j.tags) ? j.tags : [],
+              });
+            }
+          });
+          
+          const mapped: Job[] = Array.from(uniqueJobsMap.values());
+          setJobs(mapped);
+        }
+
+        // Load saved jobs
+        const { data: savedJobsData } = await supabase
+          .from('saved_jobs')
+          .select('job_id')
+          .eq('user_id', user.id);
+
+        if (savedJobsData) {
+          const savedIds = new Set(savedJobsData.map(sj => sj.job_id));
+          setSavedJobIds(savedIds);
+          setSavedJobCount(savedIds.size);
+        }
+
+        // Load applications
+        const { data: applicationsData } = await supabase
+          .from('job_applications')
+          .select('job_id')
+          .eq('user_id', user.id);
+
+        if (applicationsData) {
+          const appliedIds = new Set(applicationsData.map(app => app.job_id));
+          setAppliedJobIds(appliedIds);
+          setApplicationCount(appliedIds.size);
+        }
+
         setCheckingProfile(false);
       }
     };
@@ -212,7 +260,7 @@ export default function Dashboard() {
                 📝
               </div>
               <div>
-                <div className="text-2xl font-bold">0</div>
+                <div className="text-2xl font-bold">{applicationCount}</div>
                 <div className="text-sm text-black/60 dark:text-white/60">Applications</div>
               </div>
             </div>
@@ -224,7 +272,7 @@ export default function Dashboard() {
                 ⭐
               </div>
               <div>
-                <div className="text-2xl font-bold">0</div>
+                <div className="text-2xl font-bold">{savedJobCount}</div>
                 <div className="text-sm text-black/60 dark:text-white/60">Saved Jobs</div>
               </div>
             </div>
@@ -332,7 +380,7 @@ export default function Dashboard() {
             {filteredJobs.map((job) => (
               <div
                 key={job.id}
-                className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-black/10 dark:border-white/15 shadow-sm hover:shadow-md transition-all hover:border-emerald-500/50 cursor-pointer"
+                className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-black/10 dark:border-white/15 shadow-sm hover:shadow-md transition-all hover:border-emerald-500/50"
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                   <div className="flex-1">
@@ -341,9 +389,11 @@ export default function Dashboard() {
                         {job.company[0]}
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold mb-1 hover:text-emerald-600 transition-colors">
-                          {job.title}
-                        </h3>
+                        <Link href={`/jobs/${job.id}`}>
+                          <h3 className="text-xl font-bold mb-1 hover:text-emerald-600 transition-colors cursor-pointer">
+                            {job.title}
+                          </h3>
+                        </Link>
                         <div className="flex flex-wrap items-center gap-3 text-sm text-black/60 dark:text-white/60 mb-3">
                           <span className="font-medium text-emerald-600 dark:text-emerald-400">
                             {job.company}
@@ -379,11 +429,30 @@ export default function Dashboard() {
                     <span className="text-xs text-black/50 dark:text-white/50">
                       {job.posted}
                     </span>
-                    <button className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg">
-                      Apply Now
-                    </button>
-                    <button className="px-6 py-2 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-sm font-medium">
-                      Save Job
+                    {appliedJobIds.has(job.id) ? (
+                      <button 
+                        disabled
+                        className="px-6 py-2 font-semibold rounded-lg transition-all shadow-md bg-gray-400 cursor-not-allowed text-white"
+                      >
+                        ✓ Applied
+                      </button>
+                    ) : (
+                      <Link
+                        href={`/jobs/${job.id}`}
+                        className="px-6 py-2 font-semibold rounded-lg transition-all shadow-md bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-lg text-center"
+                      >
+                        Apply Now
+                      </Link>
+                    )}
+                    <button 
+                      onClick={() => handleSaveJob(job.id)}
+                      className={`px-6 py-2 border rounded-lg transition-all text-sm font-medium ${
+                        savedJobIds.has(job.id)
+                          ? 'border-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-400'
+                          : 'border-gray-300 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-800'
+                      }`}
+                    >
+                      {savedJobIds.has(job.id) ? '⭐ Saved' : 'Save Job'}
                     </button>
                   </div>
                 </div>
@@ -425,15 +494,23 @@ export default function Dashboard() {
             </p>
           </Link>
 
-          <div className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl text-white hover:shadow-lg transition-all cursor-pointer">
-            <div className="text-3xl mb-2">🎯</div>
-            <h3 className="text-xl font-bold mb-1">AI Career Insights</h3>
+          <div 
+            onClick={() => setShowAIAgent(true)}
+            className="bg-gradient-to-br from-blue-500 to-blue-600 p-6 rounded-2xl text-white hover:shadow-lg transition-all cursor-pointer"
+          >
+            <div className="text-3xl mb-2">🤖</div>
+            <h3 className="text-xl font-bold mb-1">AI Career Agent</h3>
             <p className="text-blue-50">
-              Get personalized career recommendations
+              Chat with your personal AI career mentor
             </p>
           </div>
         </div>
       </div>
+
+      {/* AI Career Agent Modal */}
+      {showAIAgent && (
+        <CareerAgentChat onClose={() => setShowAIAgent(false)} />
+      )}
     </div>
   );
 }

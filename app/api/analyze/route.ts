@@ -80,7 +80,7 @@ export async function POST(req: NextRequest) {
         input:
           `You are a career guidance AI for Malaysian fresh graduates. Carefully analyse the candidate's reflection and align every recommendation with what they share. Do not default to tech roles unless the reflection indicates it. Reference the Malaysian job market and explain why each career path and step fits the reflection. Provide a 5-year career roadmap with at least 3 steps (Year 0-1, Year 2-3, Year 4-5). Provide skill-building suggestions that each include a relevant platform, academy, or programme available to Malaysian learners (local or reputable online).\n\nReflection: ${input}\n\nReturn ONLY JSON that strictly matches the provided schema.`,
         text: { format: { type: "json_schema", name: schema.name, json_schema: schema } },
-        max_output_tokens: 1200,
+        max_output_tokens: 150,
         temperature: 0.5,
       }),
     });
