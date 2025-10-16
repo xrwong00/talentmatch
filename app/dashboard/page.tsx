@@ -353,9 +353,12 @@ export default function Dashboard() {
                           {job.title}
                         </h3>
                         <div className="flex flex-wrap items-center gap-3 text-sm text-black/60 dark:text-white/60 mb-3">
-                          <span className="font-medium text-emerald-600 dark:text-emerald-400">
+                          <Link 
+                            href={`/company/${job.id}`}
+                            className="font-medium text-emerald-600 dark:text-emerald-400 hover:underline"
+                          >
                             {job.company}
-                          </span>
+                          </Link>
                           <span>•</span>
                           <span className="flex items-center gap-1">
                             📍 {job.location}
@@ -387,10 +390,16 @@ export default function Dashboard() {
                     <span className="text-xs text-black/50 dark:text-white/50">
                       {job.posted}
                     </span>
-                    <button className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg">
+                    <button className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg whitespace-nowrap">
                       Apply Now
                     </button>
-                    <button className="px-6 py-2 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-sm font-medium">
+                    <Link 
+                      href={`/company/${job.id}`}
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg text-sm text-center whitespace-nowrap"
+                    >
+                      🏢 Company Insights
+                    </Link>
+                    <button className="px-6 py-2 border border-gray-300 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-all text-sm font-medium whitespace-nowrap">
                       Save Job
                     </button>
                   </div>
