@@ -1,5 +1,5 @@
 import Image from "next/image";
-import HeroDiscoveryButton from "./components/HeroDiscoveryButton";
+import AuthButtons from "./components/AuthButtons";
 
 export default function Home() {
   return (
@@ -19,6 +19,10 @@ export default function Home() {
             <a href="#how" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">How it works</a>
             <a href="#testimonials" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Stories</a>
             <a href="#cta" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">Get started</a>
+            <AuthButtons />
+          </div>
+          <div className="md:hidden">
+            <AuthButtons />
           </div>
         </nav>
 
@@ -32,7 +36,12 @@ export default function Home() {
               Malaysia&apos;s AI-powered career platform that maps your 5-year evolution—showing entry roles you can start now and senior positions you&apos;ll reach next.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <HeroDiscoveryButton />
+              <a
+                href="/dashboard"
+                className="inline-flex items-center justify-center rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-8 h-12 text-sm font-semibold shadow-lg shadow-emerald-600/25 hover:shadow-xl hover:shadow-emerald-600/30 transition-all hover:scale-105"
+              >
+                Get Started
+              </a>
               <a
                 href="#features"
                 className="inline-flex items-center justify-center rounded-full border-2 border-black/10 dark:border-white/20 px-8 h-12 text-sm font-semibold hover:bg-black/5 dark:hover:bg-white/5 hover:border-black/20 dark:hover:border-white/30 transition-all"

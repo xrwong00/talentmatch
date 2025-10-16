@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 type Phase = "reflect" | "choose" | "type" | "speak" | "analyzing" | "result";
 
@@ -48,366 +47,12 @@ interface AnalyzeResult {
   suggestions?: AnalyzeResultSuggestion[];
 }
 
-interface DomainTemplate {
-  keywords: string[];
-  negativeKeywords?: string[];
-  build: (normalized: string, original: string) => AnalyzeResult;
-}
-
-const trimAndLower = (value: string) => value.trim().toLowerCase();
-
-const summarizeReflection = (reflection: string) => {
-  const cleaned = reflection.trim();
-  return cleaned.length > 0 ? cleaned : "your reflection";
+const isAnalyzeResult = (value: unknown): value is AnalyzeResult => {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<AnalyzeResult>;
+  return Array.isArray(candidate.careerPaths) && Array.isArray(candidate.careerMap);
 };
 
-const engineeringTemplate: DomainTemplate = {
-  keywords: [
-    "engineering",
-    "engineer",
-    "embedded",
-    "hardware",
-    "mechatronic",
-    "mechanical",
-    "circuit",
-    "iot",
-    "manufactur",
-    "robotics",
-  ],
-  negativeKeywords: ["software", "coding", "developer"],
-  build: (_normalized, original) => ({
-    careerPaths: [
-      {
-        title: "Hardware Design Engineer",
-        confidence: 0.84,
-        reasons: [
-          `You highlighted an engineering background in ${summarizeReflection(original)}, which fits PCB and electronics design work.`,
-        ],
-      },
-      {
-        title: "Product Development Engineer",
-        confidence: 0.78,
-        reasons: ["Combines prototyping, testing, and cross-functional collaboration common in Malaysian electronics hubs."],
-      },
-      {
-        title: "Automation & Mechatronics Specialist",
-        confidence: 0.72,
-        reasons: ["Engineering fundamentals translate well into factory automation and robotics roles across Penang and Selangor."],
-      },
-    ],
-    careerMap: [
-      {
-        title: "Junior Test Engineer",
-        timeframe: "Year 0-1",
-        description: "Support PCB assembly testing, troubleshoot boards, and learn quality systems in manufacturing plants.",
-      },
-      {
-        title: "Embedded Systems Engineer",
-        timeframe: "Year 2-3",
-        description: "Design firmware-hardware integration, build IoT prototypes, and coordinate with mechanical teams.",
-      },
-      {
-        title: "Technical Project Lead",
-        timeframe: "Year 4-5",
-        description: "Own hardware roadmaps, manage vendor relationships, and mentor junior engineers.",
-      },
-    ],
-    suggestions: [
-      {
-        focusArea: "Hands-on electronics",
-        action: "Build prototype boards and run measurements to deepen hardware troubleshooting confidence.",
-        resourceName: "Keysight University",
-        resourceDescription: "Free instrument labs and PCB measurement lessons from a Malaysian-founded company",
-        resourceUrl: "https://www.keysight.com/my/en/training-events/keysight-university.html",
-      },
-      {
-        focusArea: "Manufacturing exposure",
-        action: "Experience DFM and production collaboration through factory tours or industry-led workshops.",
-        resourceName: "Penang Skills Development Centre (PSDC)",
-        resourceDescription: "Advanced manufacturing courses popular with Malaysian E&E grads",
-        resourceUrl: "https://www.psdc.org.my/",
-      },
-      {
-        focusArea: "Professional credibility",
-        action: "Join engineering bodies and log projects towards chartership.",
-        resourceName: "Institution of Engineers Malaysia (IEM) Graduate Membership",
-        resourceDescription: "Networking and professional development pathway for Malaysian engineers",
-        resourceUrl: "https://www.myiem.org.my/",
-      },
-    ],
-  }),
-};
-
-const softwareTemplate: DomainTemplate = {
-  keywords: ["software", "developer", "coding", "programming", "web", "app"],
-  build: (_normalized, original) => ({
-    careerPaths: [
-      {
-        title: "Software Engineer",
-        confidence: 0.83,
-        reasons: [`${summarizeReflection(original)} points to programming interests aligned with build-focused roles.`],
-      },
-      {
-        title: "Product Developer",
-        confidence: 0.76,
-        reasons: ["Pairs coding skills with user problem discovery for Malaysia's tech startups."],
-      },
-      {
-        title: "Technical Consultant",
-        confidence: 0.7,
-        reasons: ["Transforms coding fluency into client-facing solution delivery roles."],
-      },
-    ],
-    careerMap: [
-      {
-        title: "Junior Software Engineer",
-        timeframe: "Year 0-1",
-        description: "Ship features with guidance, write tests, and learn team delivery workflows.",
-      },
-      {
-        title: "Product Engineer",
-        timeframe: "Year 2-3",
-        description: "Own user stories end-to-end, collaborate with designers, and improve reliability.",
-      },
-      {
-        title: "Engineering Lead",
-        timeframe: "Year 4-5",
-        description: "Guide architecture, mentor juniors, and align tech initiatives to product goals.",
-      },
-    ],
-    suggestions: [
-      {
-        focusArea: "Full-stack depth",
-        action: "Strengthen React and Node fundamentals by shipping mini SaaS projects.",
-        resourceName: "Scrimba Frontend Developer Career Path",
-        resourceDescription: "Interactive lessons suitable for Malaysian learners",
-        resourceUrl: "https://scrimba.com/learn/frontend",
-      },
-      {
-        focusArea: "Product exposure",
-        action: "Collaborate with local founders or hackathons to build real user-facing features.",
-        resourceName: "MaGIC Global Accelerator Programme",
-        resourceDescription: "Connects Malaysian tech talent with startups",
-        resourceUrl: "https://www.mymagic.my/",
-      },
-      {
-        focusArea: "Career signalling",
-        action: "Publish a portfolio and write technical case studies to showcase impact.",
-        resourceName: "Hashnode",
-        resourceDescription: "Free developer blogging community",
-        resourceUrl: "https://hashnode.com/",
-      },
-    ],
-  }),
-};
-
-const actuarialTemplate: DomainTemplate = {
-  keywords: ["actuarial", "statistics", "risk modelling", "insurance", "probability"],
-  build: (_normalized, original) => ({
-    careerPaths: [
-      {
-        title: "Actuarial Analyst",
-        confidence: 0.84,
-        reasons: [`${summarizeReflection(original)} signals quantitative strengths suited for pricing and reserving work.`],
-      },
-      {
-        title: "Risk Consultant",
-        confidence: 0.77,
-        reasons: ["Applies actuarial techniques across enterprise risk and financial services."],
-      },
-      {
-        title: "Insurance Product Strategist",
-        confidence: 0.72,
-        reasons: ["Supports long-term product planning using actuarial insights."],
-      },
-    ],
-    careerMap: [
-      {
-        title: "Actuarial Trainee",
-        timeframe: "Year 0-1",
-        description: "Rotate across pricing, valuation, and data teams while passing core exams.",
-      },
-      {
-        title: "Actuarial Associate",
-        timeframe: "Year 2-3",
-        description: "Lead reserving studies, model risk scenarios, and guide junior analysts.",
-      },
-      {
-        title: "Lead Actuary / Risk Manager",
-        timeframe: "Year 4-5",
-        description: "Shape risk appetite, advise leadership, and manage multidisciplinary teams.",
-      },
-    ],
-    suggestions: [
-      {
-        focusArea: "Professional exams",
-        action: "Create a disciplined study plan for SOA/IFoA papers with weekly mock exams.",
-        resourceName: "Actuarial Society of Malaysia (ASM)",
-        resourceDescription: "Local exam prep workshops and networking",
-        resourceUrl: "https://www.actuaries.org.my/",
-      },
-      {
-        focusArea: "Industry tools",
-        action: "Learn Prophet or SQL-based reserving tools through guided labs.",
-        resourceName: "Sunway College Actuarial Science Courses",
-        resourceDescription: "Workshops covering actuarial software exposure",
-        resourceUrl: "https://sunway.edu.my/sunway-college/",
-      },
-      {
-        focusArea: "Communication skills",
-        action: "Present complex models through storytelling for non-technical stakeholders.",
-        resourceName: "Toastmasters Malaysia",
-        resourceDescription: "Clubs that sharpen presentation confidence",
-        resourceUrl: "https://www.toastmasters.org/find-a-club",
-      },
-    ],
-  }),
-};
-
-const designTemplate: DomainTemplate = {
-  keywords: ["design", "sketch", "illustration", "product design", "ux", "ui", "creative", "architecture"],
-  negativeKeywords: ["software"],
-  build: (_normalized, original) => ({
-    careerPaths: [
-      {
-        title: "Product Designer",
-        confidence: 0.8,
-        reasons: [`${summarizeReflection(original)} highlights creativity suited to user-centred design work.`],
-      },
-      {
-        title: "UX Researcher",
-        confidence: 0.73,
-        reasons: ["Builds on curiosity and empathy to shape product decisions."],
-      },
-      {
-        title: "Creative Technologist",
-        confidence: 0.7,
-        reasons: ["Pairs design intuition with prototyping for interactive experiences."],
-      },
-    ],
-    careerMap: [
-      {
-        title: "Junior UX Designer",
-        timeframe: "Year 0-1",
-        description: "Conduct usability tests, translate insights into wireframes, and improve design systems.",
-      },
-      {
-        title: "Product Designer",
-        timeframe: "Year 2-3",
-        description: "Drive end-to-end flows, partner with engineers, and measure user impact.",
-      },
-      {
-        title: "Design Lead",
-        timeframe: "Year 4-5",
-        description: "Mentor designers, align brand consistency, and advocate for design strategy.",
-      },
-    ],
-    suggestions: [
-      {
-        focusArea: "Portfolio depth",
-        action: "Document projects with research goals, process, and measurable outcomes.",
-        resourceName: "The Interaction Design Foundation (IxDF)",
-        resourceDescription: "Affordable UX courses accessible from Malaysia",
-        resourceUrl: "https://www.interaction-design.org/",
-      },
-      {
-        focusArea: "User research",
-        action: "Run interviews and usability tests with Malaysian users to understand local behaviours.",
-        resourceName: "UX Malaysia Community",
-        resourceDescription: "Meetups and talks tailored to local designers",
-        resourceUrl: "https://www.uxmalaysia.com/",
-      },
-      {
-        focusArea: "Prototyping skills",
-        action: "Practice rapid prototyping with Figma, Framer, or Webflow.",
-        resourceName: "Figma Learn",
-        resourceDescription: "Official tutorials and community files",
-        resourceUrl: "https://www.figma.com/resources/learn-design/",
-      },
-    ],
-  }),
-};
-
-const generalTemplate: DomainTemplate = {
-  keywords: [],
-  build: (_normalized, original) => ({
-    careerPaths: [
-      {
-        title: "Business Operations Associate",
-        confidence: 0.72,
-        reasons: ["Versatile role to explore interests while learning how organisations run."],
-      },
-      {
-        title: "Project Coordinator",
-        confidence: 0.69,
-        reasons: ["Builds planning, communication, and stakeholder skills across sectors."],
-      },
-    ],
-    careerMap: [
-      {
-        title: "Operations Executive",
-        timeframe: "Year 0-1",
-        description: "Improve internal processes, document SOPs, and support data tracking.",
-      },
-      {
-        title: "Project Specialist",
-        timeframe: "Year 2-3",
-        description: "Coordinate initiatives, manage timelines, and resolve cross-team blockers.",
-      },
-      {
-        title: "Strategy Manager",
-        timeframe: "Year 4-5",
-        description: "Lead strategic projects, drive change management, and mentor juniors.",
-      },
-    ],
-    suggestions: [
-      {
-        focusArea: "Career clarity",
-        action: `Expand ${summarizeReflection(original)} by journaling interests and tracking energy levels across tasks.`,
-        resourceName: "MyStartr Career Programmes",
-        resourceDescription: "Local workshops helping Malaysian grads explore careers",
-        resourceUrl: "https://mystartr.com/",
-      },
-      {
-        focusArea: "Core skills",
-        action: "Develop spreadsheet, presentation, and stakeholder communication fundamentals.",
-        resourceName: "Google Project Management Certificate",
-        resourceDescription: "Structured operations toolkit with flexible schedule",
-        resourceUrl: "https://www.coursera.org/professional-certificates/google-project-management",
-      },
-      {
-        focusArea: "Professional network",
-        action: "Attend industry meetups to test interests and learn hiring expectations.",
-        resourceName: "Young Corporate Malaysians",
-        resourceDescription: "Community events for Malaysian students and grads",
-        resourceUrl: "https://www.youngcorporatemalaysians.com/",
-      },
-    ],
-  }),
-};
-
-const templates: DomainTemplate[] = [softwareTemplate, engineeringTemplate, actuarialTemplate, designTemplate];
-
-const generateFallbackInsights = (input: string): AnalyzeResult => {
-  const normalized = trimAndLower(input);
-  if (!normalized) return generalTemplate.build(normalized, input);
-
-  const scored = templates
-    .map((template) => {
-      const positive =
-        template.keywords.length === 0
-          ? 0
-          : template.keywords.reduce((acc, keyword) => (normalized.includes(keyword) ? acc + 1 : acc), 0);
-      const negative =
-        template.negativeKeywords?.reduce((acc, keyword) => (normalized.includes(keyword) ? acc + 1 : acc), 0) ?? 0;
-      const score = positive - negative * 1.5;
-      return { template, score };
-    })
-    .filter((entry) => entry.score > 0);
-
-  const chosen = scored.sort((a, b) => b.score - a.score)[0]?.template ?? generalTemplate;
-  return chosen.build(normalized, input);
-};
 
 interface DiscoverCareerModalProps {
   isOpen: boolean;
@@ -415,13 +60,13 @@ interface DiscoverCareerModalProps {
 }
 
 export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerModalProps) {
-  const router = useRouter();
   const [phase, setPhase] = useState<Phase>("reflect");
   const [timeLeft, setTimeLeft] = useState(180);
   const [inputText, setInputText] = useState("");
   const [transcript, setTranscript] = useState("");
   const [isRecording, setIsRecording] = useState(false);
   const [result, setResult] = useState<AnalyzeResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
@@ -431,6 +76,7 @@ export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerM
     setInputText("");
     setTranscript("");
     setResult(null);
+    setError(null);
   }, [isOpen]);
 
   useEffect(() => {
@@ -493,56 +139,106 @@ export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerM
   };
 
   const submitForAnalysis = async (text: string) => {
-    if (!text || !text.trim()) return;
+    const cleaned = text.trim();
+    if (!cleaned) return;
+
     setPhase("analyzing");
+    setError(null);
+    setResult(null);
+
     try {
       const res = await fetch("/api/analyze", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ input: text }),
+        body: JSON.stringify({ input: cleaned }),
       });
-      if (!res.ok) throw new Error("Failed to analyze");
-      const data = (await res.json()) as AnalyzeResult;
-      const enriched: AnalyzeResult = {
-        ...data,
-        suggestions: Array.isArray((data as { suggestions?: unknown }).suggestions)
-          ? ((data as { suggestions?: unknown }).suggestions as unknown[]).map((item, index) => {
-              if (typeof item === "string") {
-                return {
-                  focusArea: `Development focus ${index + 1}`,
-                  action: item,
-                  resourceName: "LinkedIn Learning",
-                };
-              }
-              const entry = item as Partial<AnalyzeResultSuggestion>;
+
+      let payload: unknown = null;
+      try {
+        payload = await res.json();
+      } catch {
+        payload = null;
+      }
+
+      if (!res.ok) {
+        let message = "Failed to analyze your profile. Please try again.";
+        if (payload && typeof payload === "object" && payload !== null) {
+          const body = payload as { error?: unknown; details?: unknown };
+          const base = typeof body.error === "string" ? body.error.trim() : "";
+          const detail = typeof body.details === "string" ? body.details.trim() : "";
+          const merged = [base, detail].filter(Boolean).join(" – ");
+          if (merged) {
+            message = merged;
+          }
+        }
+        throw new Error(message);
+      }
+
+      if (!isAnalyzeResult(payload)) {
+        throw new Error("Analysis returned incomplete data. Please refine your reflection and try again.");
+      }
+
+      const suggestions = Array.isArray(payload.suggestions)
+        ? payload.suggestions.map((item, index) => {
+            if (typeof item === "string") {
               return {
-                focusArea: entry.focusArea && entry.focusArea.trim() ? entry.focusArea : `Development focus ${index + 1}`,
-                action: entry.action && entry.action.trim() ? entry.action : "Deepen capability through focused practice.",
-                resourceName:
-                  entry.resourceName && entry.resourceName.trim() ? entry.resourceName : "LinkedIn Learning",
-                resourceDescription: entry.resourceDescription,
-                resourceUrl: entry.resourceUrl,
+                focusArea: `Development focus ${index + 1}`,
+                action: item,
+                resourceName: "LinkedIn Learning",
               };
-            })
-          : undefined,
+            }
+            if (!item || typeof item !== "object") {
+              return {
+                focusArea: `Development focus ${index + 1}`,
+                action: "Deepen capability through focused practice.",
+                resourceName: "LinkedIn Learning",
+              };
+            }
+            const entry = item as Partial<AnalyzeResultSuggestion>;
+            const focus = entry.focusArea?.trim();
+            const action = entry.action?.trim();
+            const resource = entry.resourceName?.trim();
+            return {
+              focusArea: focus && focus.length > 0 ? focus : `Development focus ${index + 1}`,
+              action: action && action.length > 0 ? action : "Deepen capability through focused practice.",
+              resourceName: resource && resource.length > 0 ? resource : "LinkedIn Learning",
+              resourceDescription: entry.resourceDescription,
+              resourceUrl: entry.resourceUrl,
+            };
+          })
+        : undefined;
+
+      const enriched: AnalyzeResult = {
+        careerPaths: payload.careerPaths,
+        careerMap: payload.careerMap,
+        suggestions,
       };
+
       setResult(enriched);
-      // Persist to session and redirect to dashboard immediately
+
       try {
         sessionStorage.setItem("tm_ai_insights", JSON.stringify(enriched));
-      } catch {}
-      onClose();
-      router.push("/dashboard");
-      return;
-    } catch {
-      const fallback = generateFallbackInsights(text);
-      setResult(fallback);
+      } catch {
+        // ignore persistence failures
+      }
+
+      setPhase("result");
+    } catch (error) {
+      console.error("Analysis error:", error);
+      setResult(null);
+
       try {
-        sessionStorage.setItem("tm_ai_insights", JSON.stringify(fallback));
-      } catch {}
-      onClose();
-      router.push("/dashboard");
-      return;
+        sessionStorage.removeItem("tm_ai_insights");
+      } catch {
+        // ignore persistence failures
+      }
+
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "We couldn't analyze your profile. Please try again.";
+      setError(message);
+      setPhase("type");
     }
   };
 
@@ -550,15 +246,23 @@ export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerM
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-background text-foreground w-full max-w-3xl rounded-3xl shadow-2xl p-6 sm:p-8 md:p-10 relative">
+      {/* Make the modal container flex-col with max height and an internal scrollable area */}
+      <div className="bg-background text-foreground w-full max-w-3xl max-h-[90vh] rounded-3xl shadow-2xl relative flex flex-col overflow-hidden">
         <button
           onClick={onClose}
           aria-label="Close"
-          className="absolute top-4 right-4 rounded-full w-9 h-9 flex items-center justify-center bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10"
+          className="absolute top-4 right-4 z-10 rounded-full w-9 h-9 flex items-center justify-center bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10"
         >
           ✕
         </button>
 
+        {/* Scrollable content area so long results can be viewed fully */}
+        <div className="overflow-y-auto p-6 sm:p-8 md:p-10">
+          {error && (
+            <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/40 dark:bg-red-900/20 dark:text-red-100">
+              {error}
+            </div>
+          )}
         {phase === "reflect" && (
           <div className="text-center">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white text-3xl font-bold mb-6 shadow-lg shadow-emerald-500/25">
@@ -746,25 +450,26 @@ export default function DiscoverCareerModal({ isOpen, onClose }: DiscoverCareerM
             )}
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/mentorship" className="inline-flex items-center justify-center rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 h-11 text-sm font-semibold">
-                Find a Mentor
-              </Link>
               <button
                 onClick={() => {
-                  try {
-                    if (result) sessionStorage.setItem("tm_ai_insights", JSON.stringify(result));
-                  } catch {}
                   onClose();
-                  router.push("/dashboard");
                 }}
+                className="inline-flex items-center justify-center rounded-full bg-emerald-600 hover:bg-emerald-700 text-white px-6 h-11 text-sm font-semibold"
+              >
+                Close & Continue
+              </button>
+              <Link 
+                href="/profile/setup"
                 className="inline-flex items-center justify-center rounded-full border border-black/10 dark:border-white/20 px-6 h-11 text-sm font-semibold hover:bg-black/5 dark:hover:bg-white/5"
               >
-                View in Dashboard
-              </button>
+                Update My Profile
+              </Link>
             </div>
           </div>
         )}
+        </div>
       </div>
     </div>
   );
 }
+

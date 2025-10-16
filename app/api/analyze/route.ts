@@ -75,35 +75,22 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: process.env.OPENAI_MODEL || "gpt-5-mini",
-        input: [
-          {
-            role: "system",
-            content: [
-              {
-                type: "input_text",
-                text:
-                  "You are a career guidance AI for Malaysian fresh graduates. Carefully analyse the candidate's reflection and align every recommendation with what they share. Do not default to tech roles unless the reflection indicates it. Reference the Malaysian job market and explain why each career path and step fits the reflection. Provide skill-building suggestions that each include a relevant platform, academy, or programme available to Malaysian learners (local or reputable online).",
-              },
-            ],
-          },
-          {
-            role: "user",
-            content: [
-              {
-                type: "input_text",
-                text: `Reflection: ${input}`,
-              },
-            ],
-          },
-        ],
-        response_format: { type: "json_schema", json_schema: schema },
-        max_output_tokens: 600,
-        temperature: 0.4,
+        // Provide a single input string with clear instructions. The Responses API
+        // will validate and return JSON according to the provided schema.
+        input:
+          `You are a career guidance AI for Malaysian fresh graduates. Carefully analyse the candidate's reflection and align every recommendation with what they share. Do not default to tech roles unless the reflection indicates it. Reference the Malaysian job market and explain why each career path and step fits the reflection. Provide a 5-year career roadmap with at least 3 steps (Year 0-1, Year 2-3, Year 4-5). Provide skill-building suggestions that each include a relevant platform, academy, or programme available to Malaysian learners (local or reputable online).\n\nReflection: ${input}\n\nReturn ONLY JSON that strictly matches the provided schema.`,
+        text: { format: { type: "json_schema", name: schema.name, json_schema: schema } },
+        max_output_tokens: 1200,
+        temperature: 0.5,
       }),
     });
 
     if (!response.ok) {
-      throw new Error(`OpenAI error: ${response.status}`);
+      const details = await response.text().catch(() => "");
+      return new Response(JSON.stringify({ error: "OpenAI request failed", details }), {
+        status: 502,
+        headers: { "content-type": "application/json" },
+      });
     }
 
     type Parsed = {
@@ -127,7 +114,9 @@ export async function POST(req: NextRequest) {
     };
 
     const data: OpenAIResponse = await response.json();
-    const parsed: Parsed | undefined =
+
+    // Responses API with json_schema returns output_parsed when successful
+    let parsed: Parsed | undefined =
       data.output_parsed || data.parsed || data.output?.[0]?.content?.[0]?.json;
 
     if (!parsed) {
@@ -157,4 +146,3 @@ export async function POST(req: NextRequest) {
     });
   }
 }
-
