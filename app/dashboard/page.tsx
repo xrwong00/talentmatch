@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
+import CareerDiscoveryModal from "@/app/components/CareerDiscoveryModal";
 
 type Job = {
   id: string;
@@ -30,6 +31,7 @@ export default function Dashboard() {
   const [locationFilter, setLocationFilter] = useState("");
   const [jobTypeFilter, setJobTypeFilter] = useState("");
   const [profile, setProfile] = useState<any>(null);
+  const [showCareerModal, setShowCareerModal] = useState(false);
 
   // Mock job data - In production, this would come from your database
   const [jobs] = useState<Job[]>([
@@ -162,6 +164,12 @@ export default function Dashboard() {
             <span className="text-lg font-semibold">TalentMatch</span>
           </div>
           <div className="flex items-center gap-6">
+            <button
+              onClick={() => setShowCareerModal(true)}
+              className="text-sm font-medium text-white bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg hidden sm:block"
+            >
+              Discover My Career Path
+            </button>
             <Link href="/" className="text-sm font-medium hover:text-emerald-600 transition-colors hidden sm:block">
               Home
             </Link>
@@ -434,6 +442,12 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
+
+      {/* Career Discovery Modal */}
+      <CareerDiscoveryModal 
+        isOpen={showCareerModal} 
+        onClose={() => setShowCareerModal(false)} 
+      />
     </div>
   );
 }
