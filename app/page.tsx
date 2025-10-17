@@ -74,13 +74,13 @@ export default function Home() {
             </div>
           </div>
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-br from-emerald-400/20 to-blue-400/20 blur-3xl -z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-emerald-100/40 via-rose-50/30 to-blue-50/20 dark:from-emerald-900/20 dark:via-rose-900/10 dark:to-blue-900/10 blur-3xl -z-10"></div>
         <Image
-              src="/hero-illustration.svg"
+              src="/hero-illustration.png"
               alt="TalentMatch hero illustration"
-              width={640}
-              height={480}
-              className="w-full h-auto drop-shadow-2xl"
+              width={1600}
+              height={1067}
+              className="w-full h-auto drop-shadow-xl scale-110"
           priority
         />
           </div>
