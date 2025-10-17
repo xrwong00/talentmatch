@@ -212,6 +212,12 @@ export default function Dashboard() {
             <span className="text-lg font-semibold">TalentMatch</span>
           </div>
           <div className="flex items-center gap-6">
+            <Link
+              href="/mentor"
+              className="text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg hidden sm:block"
+            >
+              Connect with Mentor
+            </Link>
             <button
               onClick={() => setShowCareerModal(true)}
               className="text-sm font-medium text-white bg-gradient-to-r from-emerald-500 to-blue-600 hover:from-emerald-600 hover:to-blue-700 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg hidden sm:block"
