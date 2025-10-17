@@ -28,10 +28,15 @@ export default function Home() {
 
         <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center mt-16 md:mt-20">
           <div>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.1] tracking-tight">
-              See your career
-              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">from first role to future</span>
-            </h1>
+          <h1 className="font-bold leading-[1.1] tracking-tight">
+  <span className="block text-4xl sm:text-5xl md:text-6xl whitespace-nowrap">
+    Discover your purpose.
+  </span>
+  <span className="block text-emerald-600 dark:text-emerald-400 mt-2 text-4xl sm:text-5xl md:text-6xl">
+    Design your future.
+  </span>
+</h1>
+
             <p className="mt-6 text-lg sm:text-xl text-black/70 dark:text-white/70 leading-relaxed">
               Malaysia&apos;s AI-powered career platform that helps you to discover where you fit, how you&apos;ll grow, and the path that leads you to leadership.
             </p>
