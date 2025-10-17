@@ -11,7 +11,7 @@ export default function EmployerPage() {
         
         <nav className="flex items-center justify-between py-4">
           <Link href="/" className="flex items-center gap-3">
-            <Image src="/talentmatch-logo.svg" alt="TalentMatch" width={40} height={40} className="drop-shadow-sm" />
+            <Image src="/talentmatch-logo.png" alt="TalentMatch" width={40} height={40} className="drop-shadow-sm" />
             <span className="text-xl font-semibold tracking-tight">TalentMatch</span>
           </Link>
           <div className="flex items-center gap-4">
@@ -127,7 +127,7 @@ export default function EmployerPage() {
       <footer className="px-6 sm:px-10 md:px-16 lg:px-24 py-12 border-t border-black/10 dark:border-white/15">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <Image src="/talentmatch-logo.svg" alt="TalentMatch" width={28} height={28} />
+            <Image src="/talentmatch-logo.png" alt="TalentMatch" width={28} height={28} />
             <div className="text-sm text-black/60 dark:text-white/60">
               © {new Date().getFullYear()} TalentMatch. Empowering career growth across Malaysia.
             </div>

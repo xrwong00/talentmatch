@@ -74,7 +74,7 @@ export default function CompanyInsightsPage() {
       <header className="bg-white dark:bg-gray-900 border-b border-black/10 dark:border-white/15 sticky top-0 z-40 backdrop-blur-lg bg-white/90 dark:bg-gray-900/90">
         <div className="px-6 sm:px-10 md:px-16 lg:px-24 py-4 flex items-center justify-between">
           <Link href="/dashboard" className="flex items-center gap-3">
-            <Image src="/talentmatch-logo.svg" alt="TalentMatch" width={32} height={32} />
+            <Image src="/talentmatch-logo.png" alt="TalentMatch" width={32} height={32} />
             <span className="text-lg font-semibold">TalentMatch</span>
           </Link>
           <Link
