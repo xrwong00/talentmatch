@@ -459,7 +459,7 @@ export default function Dashboard() {
                       href={`/company/${job.id}`}
                       className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg text-sm text-center whitespace-nowrap"
                     >
-                      🏢 Company Insights
+                      AI Analysis
                     </Link>
                     <button 
                       onClick={() => handleSaveJob(job.id)}
