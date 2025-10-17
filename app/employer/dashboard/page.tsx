@@ -81,7 +81,7 @@ export default function EmployerDashboard() {
         <div className="px-6 sm:px-10 md:px-16 lg:px-24 py-4">
           <div className="flex items-center justify-between">
             <Link href="/employer" className="flex items-center gap-3">
-              <Image src="/talentmatch-logo.svg" alt="TalentMatch" width={36} height={36} />
+              <Image src="/talentmatch-logo.png" alt="TalentMatch" width={36} height={36} />
               <span className="text-xl font-semibold tracking-tight">TalentMatch</span>
             </Link>
             <div className="flex items-center gap-4">
