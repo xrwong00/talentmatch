@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import Link from "next/link";
 
 type CareerPath = {
   title: string;
@@ -512,9 +513,12 @@ export default function CareerDiscoveryModal({ isOpen, onClose }: CareerDiscover
                       Connect with experienced mentors who can guide you on your career journey
                     </p>
                   </div>
-                  <button className="px-6 py-3 bg-white text-orange-600 font-semibold rounded-xl hover:bg-orange-50 transition-all shadow-lg flex-shrink-0">
+                  <Link
+                    href="/mentor"
+                    className="px-6 py-3 bg-white text-orange-600 font-semibold rounded-xl hover:bg-orange-50 transition-all shadow-lg flex-shrink-0"
+                  >
                     Find a Mentor
-                  </button>
+                  </Link>
                 </div>
               </div>
 
