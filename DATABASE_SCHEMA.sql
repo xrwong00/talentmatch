@@ -162,6 +162,39 @@ alter table public.skills enable row level security;
 alter table public.languages enable row level security;
 
 -- =====================================================
+-- COMPANIES AND JOBS TABLES
+-- =====================================================
+create table if not exists public.companies (
+  id uuid default uuid_generate_v4() primary key,
+  name text not null unique,
+  location text,
+  logo_url text,
+  website_url text,
+  description text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+create table if not exists public.jobs (
+  id uuid default uuid_generate_v4() primary key,
+  company_id uuid references public.companies(id) on delete cascade not null,
+  title text not null,
+  location text,
+  employment_type text check (employment_type in ('Full-time', 'Part-time', 'Contract', 'Internship')),
+  salary text,
+  description text,
+  tags text[],
+  apply_url text,
+  posted_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  is_active boolean default true,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+alter table public.companies enable row level security;
+alter table public.jobs enable row level security;
+
+-- =====================================================
 -- PROFILES POLICIES
 -- =====================================================
 create policy "Public profiles are viewable by everyone"
@@ -310,6 +343,57 @@ create policy "Users can delete their own languages"
   using (auth.uid() = user_id);
 
 -- =====================================================
+-- COMPANIES POLICIES
+-- =====================================================
+create policy "Companies are publicly readable"
+  on public.companies for select
+  using (true);
+
+-- Only allow authenticated users with employer profile to insert/update/delete
+create policy "Employers can insert companies"
+  on public.companies for insert
+  with check (exists (
+    select 1 from public.profiles p where p.id = auth.uid() and p.user_type = 'employer'
+  ));
+
+create policy "Employers can update companies"
+  on public.companies for update
+  using (exists (
+    select 1 from public.profiles p where p.id = auth.uid() and p.user_type = 'employer'
+  ));
+
+create policy "Employers can delete companies"
+  on public.companies for delete
+  using (exists (
+    select 1 from public.profiles p where p.id = auth.uid() and p.user_type = 'employer'
+  ));
+
+-- =====================================================
+-- JOBS POLICIES
+-- =====================================================
+create policy "Jobs are publicly readable"
+  on public.jobs for select
+  using (true);
+
+create policy "Employers can insert jobs"
+  on public.jobs for insert
+  with check (exists (
+    select 1 from public.profiles p where p.id = auth.uid() and p.user_type = 'employer'
+  ));
+
+create policy "Employers can update jobs"
+  on public.jobs for update
+  using (exists (
+    select 1 from public.profiles p where p.id = auth.uid() and p.user_type = 'employer'
+  ));
+
+create policy "Employers can delete jobs"
+  on public.jobs for delete
+  using (exists (
+    select 1 from public.profiles p where p.id = auth.uid() and p.user_type = 'employer'
+  ));
+
+-- =====================================================
 -- FUNCTIONS AND TRIGGERS
 -- =====================================================
 
@@ -370,6 +454,12 @@ create trigger handle_updated_at before update on public.projects
 create trigger handle_updated_at before update on public.skills
   for each row execute procedure public.handle_updated_at();
 
+create trigger handle_updated_at before update on public.companies
+  for each row execute procedure public.handle_updated_at();
+
+create trigger handle_updated_at before update on public.jobs
+  for each row execute procedure public.handle_updated_at();
+
 -- =====================================================
 -- INDEXES FOR PERFORMANCE
 -- =====================================================
@@ -381,4 +471,8 @@ create index if not exists idx_achievements_user_id on public.achievements(user_
 create index if not exists idx_projects_user_id on public.projects(user_id);
 create index if not exists idx_skills_user_id on public.skills(user_id);
 create index if not exists idx_languages_user_id on public.languages(user_id);
+
+create index if not exists idx_companies_name on public.companies(name);
+create index if not exists idx_jobs_company_id on public.jobs(company_id);
+create index if not exists idx_jobs_posted_at on public.jobs(posted_at desc);
 
