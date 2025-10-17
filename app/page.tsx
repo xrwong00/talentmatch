@@ -30,10 +30,10 @@ export default function Home() {
           <div>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold leading-[1.1] tracking-tight">
               See your career
-              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">from Day-1 to leadership</span>
+              <span className="block text-emerald-600 dark:text-emerald-400 mt-2">from first role to future</span>
             </h1>
             <p className="mt-6 text-lg sm:text-xl text-black/70 dark:text-white/70 leading-relaxed">
-              Malaysia&apos;s AI-powered career platform that maps your 5-year evolution—showing entry roles you can start now and senior positions you&apos;ll reach next.
+              Malaysia&apos;s AI-powered career platform that helps you to discover where you fit, how you&apos;ll grow, and the path that leads you to leadership.
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
               <a
