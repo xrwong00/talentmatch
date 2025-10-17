@@ -301,6 +301,68 @@ export default function Dashboard() {
           </div>
         </div>
 
+        {/* Upskilling Academy */}
+        <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-black/10 dark:border-white/15 shadow-lg mb-8">
+          <div className="mb-4">
+            <div className="flex items-center gap-2 mb-2">
+              <h2 className="text-xl font-bold">Upskill Yourself</h2>
+            </div>
+            <p className="text-sm text-black/60 dark:text-white/60">
+              Enhance your skills with courses, workshops, and talks from industry experts
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+            <div>
+              <label className="block text-sm font-medium mb-2">Search Courses</label>
+              <input
+                type="text"
+                placeholder="e.g., Python, Data Science, Leadership..."
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-800"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Category</label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-800"
+              >
+                <option value="">All Categories</option>
+                <option value="technical">Technical Skills</option>
+                <option value="soft-skills">Soft Skills</option>
+                <option value="leadership">Leadership</option>
+                <option value="data">Data & Analytics</option>
+                <option value="design">Design</option>
+                <option value="business">Business</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <div className="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-xl border border-purple-200 dark:border-purple-800 hover:shadow-md transition-all cursor-pointer">
+              <div className="text-3xl mb-2">💻</div>
+              <h3 className="font-semibold mb-1 text-black dark:text-white">Technical Courses</h3>
+              <p className="text-sm text-black/70 dark:text-white/70">Learn programming, AI, and more</p>
+            </div>
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-xl border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer">
+              <div className="text-3xl mb-2">🎤</div>
+              <h3 className="font-semibold mb-1 text-black dark:text-white">Industry Talks</h3>
+              <p className="text-sm text-black/70 dark:text-white/70">Insights from industry leaders</p>
+            </div>
+            <div className="bg-orange-50 dark:bg-orange-900/20 p-5 rounded-xl border border-orange-200 dark:border-orange-800 hover:shadow-md transition-all cursor-pointer">
+              <div className="text-3xl mb-2">🏆</div>
+              <h3 className="font-semibold mb-1 text-black dark:text-white">Certifications</h3>
+              <p className="text-sm text-black/70 dark:text-white/70">Get certified in your field</p>
+            </div>
+          </div>
+
+          <div className="flex justify-center">
+            <button className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg">
+              Explore All Courses
+            </button>
+          </div>
+        </div>
+
         {/* Search Section */}
         <div className="bg-white dark:bg-gray-900 p-6 rounded-2xl border border-black/10 dark:border-white/15 shadow-lg mb-8">
           <div className="mb-4">
