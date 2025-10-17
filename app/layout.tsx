@@ -11,7 +11,7 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "TalentMatch — Graduate Employability Platform (Malaysia)",
+  title: "TalentMatch",
   description:
     "TalentMatch helps Malaysia's fresh graduates showcase skills, build winning CVs, and get matched to the right jobs while enabling employers to hire job‑ready talent.",
   metadataBase: new URL("https://talentmatch.example.com"),
