@@ -8,6 +8,7 @@ type CareerPath = {
   description: string;
   keySkills: string[];
   salaryRange: string;
+  recommendedCompanies: string[];
 };
 
 type CareerAnalysis = {
@@ -343,9 +344,9 @@ export default function CareerDiscoveryModal({ isOpen, onClose }: CareerDiscover
                       <span className="text-xs text-black/50 dark:text-white/50">
                         {userInput.length} characters
                       </span>
-                      {userInput.length < 50 && (
+                      {userInput.length < 30 && (
                         <span className="text-xs text-orange-600">
-                          Please provide more details (min 50 characters)
+                          Please provide more details (min 30 characters)
                         </span>
                       )}
                     </div>
@@ -360,7 +361,7 @@ export default function CareerDiscoveryModal({ isOpen, onClose }: CareerDiscover
                   <div className="flex gap-4">
                     <button
                       onClick={analyzeCareer}
-                      disabled={userInput.length < 50}
+                      disabled={userInput.length < 30}
                       className="flex-1 px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-xl transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       Analyze My Career Path 🚀
@@ -387,16 +388,6 @@ export default function CareerDiscoveryModal({ isOpen, onClose }: CareerDiscover
           {/* Results Stage */}
           {stage === "results" && careerAnalysis && (
             <div>
-              <div className="mb-8 text-center">
-                <div className="inline-block px-4 py-2 bg-emerald-100 dark:bg-emerald-900/30 rounded-full text-emerald-700 dark:text-emerald-400 font-semibold mb-4">
-                  Your Personalized Career Roadmap
-                </div>
-                <h3 className="text-2xl font-bold mb-2">{careerAnalysis.currentRole}</h3>
-                <p className="text-black/60 dark:text-white/60">
-                  Based on your skills and experience
-                </p>
-              </div>
-
               {/* Strengths */}
               {careerAnalysis.strengths && careerAnalysis.strengths.length > 0 && (
                 <div className="mb-8 p-6 bg-blue-50 dark:bg-blue-900/20 rounded-2xl border border-blue-200 dark:border-blue-800">
@@ -465,6 +456,23 @@ export default function CareerDiscoveryModal({ isOpen, onClose }: CareerDiscover
                                 {path.salaryRange}
                               </span>
                             </div>
+                            {path.recommendedCompanies && path.recommendedCompanies.length > 0 && (
+                              <div className="mt-3">
+                                <p className="text-sm font-semibold text-black/60 dark:text-white/60 mb-2">
+                                  🏢 Recommended Companies:
+                                </p>
+                                <div className="flex flex-wrap gap-2">
+                                  {path.recommendedCompanies.map((company, companyIndex) => (
+                                    <span
+                                      key={companyIndex}
+                                      className="px-3 py-1 bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 rounded-lg text-sm border border-blue-200 dark:border-blue-800"
+                                    >
+                                      {company}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>

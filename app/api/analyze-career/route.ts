@@ -4,9 +4,9 @@ export async function POST(request: NextRequest) {
   try {
     const { input } = await request.json();
 
-    if (!input || typeof input !== "string" || input.trim().length < 50) {
+    if (!input || typeof input !== "string" || input.trim().length < 30) {
       return NextResponse.json(
-        { error: "Please provide a detailed description (at least 50 characters)" },
+        { error: "Please provide a detailed description (at least 30 characters)" },
         { status: 400 }
       );
     }
@@ -36,15 +36,18 @@ export async function POST(request: NextRequest) {
             content: `You are a career counselor AI specialized in helping fresh graduates and early-career professionals in Malaysia. Analyze the user's input about their education, skills, and experience, and provide:
 1. A suitable current/starting role title
 2. 3-5 key strengths based on their description
-3. A career progression path with 4-5 stages spanning 5-7 years
+3. A career progression path with 5-6 stages spanning 5-7 years, starting with an internship stage
 4. 3-5 actionable recommendations
+
+IMPORTANT: The first stage MUST always be an internship level (e.g., "Data Science Intern", "Software Engineering Intern"), even if the user has some experience.
 
 For each career path stage, include:
 - Job title
-- Years of experience range (e.g., "0-2 years", "2-4 years")
+- Years of experience range (e.g., "Internship (3-6 months)", "0-2 years", "2-4 years")
 - Description of responsibilities
 - 4-6 key skills to develop
 - Salary range in Malaysian Ringgit (RM)
+- 3 recommended companies in Malaysia that are known for hiring at this level
 
 Respond ONLY with valid JSON in this exact format:
 {
@@ -56,7 +59,8 @@ Respond ONLY with valid JSON in this exact format:
       "yearsExperience": "string",
       "description": "string",
       "keySkills": ["string"],
-      "salaryRange": "string"
+      "salaryRange": "string",
+      "recommendedCompanies": ["string"]
     }
   ],
   "recommendations": ["string"]
