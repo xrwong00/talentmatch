@@ -18,17 +18,17 @@ interface CompanyHeaderProps {
 export default function CompanyHeader({ company }: CompanyHeaderProps) {
   return (
     <div className="bg-white dark:bg-gray-900 rounded-2xl border border-black/10 dark:border-white/15 shadow-lg mb-6 overflow-hidden">
-      <div className="bg-gradient-to-r from-emerald-500 to-blue-600 h-32"></div>
-      <div className="p-8 -mt-16">
+      <div className="bg-gradient-to-r from-emerald-500 to-blue-600 h-22"></div>
+      <div className="px-8 pb-8 -mt-12">
         <div className="flex flex-col md:flex-row gap-6">
           {/* Company Logo */}
-          <div className="w-32 h-32 rounded-2xl bg-white dark:bg-gray-800 border-4 border-white dark:border-gray-900 shadow-lg flex items-center justify-center text-4xl font-bold text-emerald-600 flex-shrink-0">
+          <div className="w-24 h-24 rounded-2xl bg-white dark:bg-gray-800 border-4 border-white dark:border-gray-900 shadow-lg flex items-center justify-center text-3xl font-bold text-emerald-600 flex-shrink-0">
             {company.logo}
           </div>
 
           {/* Company Info */}
-          <div className="flex-1">
-            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-4">
+          <div className="flex-1 pt-2">
+            <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4 mb-3">
               <div>
                 <h1 className="text-3xl font-bold mb-2">{company.name}</h1>
                 <div className="flex flex-wrap items-center gap-3 text-sm text-black/60 dark:text-white/60">

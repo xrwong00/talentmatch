@@ -125,12 +125,13 @@ export default function AlumniConnect({ companyId }: AlumniConnectProps) {
       </div>
 
       {/* Alumni Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        {alumni.map((person) => (
-          <div
-            key={person.id}
-            className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-800 rounded-xl p-6 border border-black/5 dark:border-white/5 hover:shadow-lg transition-all"
-          >
+      <div className="relative mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 blur-sm pointer-events-none select-none">
+          {alumni.map((person) => (
+            <div
+              key={person.id}
+              className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-800 rounded-xl p-6 border border-black/5 dark:border-white/5"
+            >
             {/* Profile Header */}
             <div className="flex items-start gap-4 mb-4">
               <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center text-white text-2xl font-bold flex-shrink-0">
@@ -199,6 +200,23 @@ export default function AlumniConnect({ companyId }: AlumniConnectProps) {
             </div>
           </div>
         ))}
+        </div>
+
+        {/* Premium Overlay */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border-2 border-amber-500 p-8 max-w-md text-center">
+            <div className="text-6xl mb-4">👑</div>
+            <h3 className="text-2xl font-bold mb-2">Premium Feature</h3>
+            <p className="text-black/70 dark:text-white/70 mb-6">
+              Unlock exclusive access to connect with alumni from this company. Get personalized mentorship and insider insights!
+            </p>
+            <div className="space-y-3">
+              <button className="w-full px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold rounded-lg transition-all shadow-lg hover:shadow-xl">
+                Upgrade to Premium
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Info Box */}
