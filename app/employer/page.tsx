@@ -1,7 +1,47 @@
+'use client'
+
 import Image from "next/image";
 import Link from "next/link";
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/contexts/AuthContext';
+import { createClient } from '@/lib/supabase/client';
+import EmployerLoginModal from '@/app/components/EmployerLoginModal';
 
 export default function EmployerPage() {
+  const { user, loading: authLoading, signOut } = useAuth();
+  const [showLoginModal, setShowLoginModal] = useState(false);
+  const [isEmployer, setIsEmployer] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function checkUserType() {
+      if (user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', user.id)
+          .single();
+        
+        setIsEmployer(profile?.user_type === 'employer');
+      } else {
+        setIsEmployer(false);
+      }
+      setLoading(false);
+    }
+    
+    if (!authLoading) {
+      checkUserType();
+    }
+  }, [user, authLoading, supabase]);
+
+  const handleSignOut = async () => {
+    await signOut();
+    router.refresh();
+  };
+
   return (
     <div className="font-sans min-h-screen bg-background text-foreground">
       {/* Hero */}
@@ -18,12 +58,34 @@ export default function EmployerPage() {
             <Link href="/" className="text-sm font-medium hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
               For Job Seekers
             </Link>
-            <Link 
-              href="/dashboard"
-              className="px-5 py-2 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
-            >
-              Sign In
-            </Link>
+            {loading || authLoading ? (
+              <div className="w-20 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
+            ) : user && isEmployer ? (
+              <>
+                <span className="text-sm text-black/70 dark:text-white/70 hidden md:inline">
+                  {user.email}
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  className="px-5 py-2 text-sm font-semibold text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white transition-colors"
+                >
+                  Sign Out
+                </button>
+                <Link 
+                  href="/employer/dashboard"
+                  className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+                >
+                  Dashboard
+                </Link>
+              </>
+            ) : (
+              <button
+                onClick={() => setShowLoginModal(true)}
+                className="px-5 py-2 rounded-full bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold shadow-md hover:shadow-lg transition-all"
+              >
+                Sign In
+              </button>
+            )}
           </div>
         </nav>
 
@@ -134,6 +196,9 @@ export default function EmployerPage() {
           </div>
         </div>
       </footer>
+
+      {/* Login Modal */}
+      <EmployerLoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
     </div>
   );
 }
