@@ -314,15 +314,6 @@ export default function Dashboard() {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
-              <label className="block text-sm font-medium mb-2">Search Courses</label>
-              <input
-                type="text"
-                placeholder="e.g., Python, Data Science, Leadership..."
-                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-800"
-              />
-            </div>
-
-            <div>
               <label className="block text-sm font-medium mb-2">Category</label>
               <select
                 className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-800"
@@ -336,30 +327,54 @@ export default function Dashboard() {
                 <option value="business">Business</option>
               </select>
             </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">Level</label>
+              <select
+                className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-purple-500 dark:bg-gray-800"
+              >
+                <option value="">All Levels</option>
+                <option value="beginner">Beginner</option>
+                <option value="intermediate">Intermediate</option>
+                <option value="advanced">Advanced</option>
+              </select>
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
-            <div className="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-xl border border-purple-200 dark:border-purple-800 hover:shadow-md transition-all cursor-pointer">
+            <Link
+              href="/academy"
+              className="bg-purple-50 dark:bg-purple-900/20 p-5 rounded-xl border border-purple-200 dark:border-purple-800 hover:shadow-md transition-all cursor-pointer"
+            >
               <div className="text-3xl mb-2">💻</div>
               <h3 className="font-semibold mb-1 text-black dark:text-white">Technical Courses</h3>
               <p className="text-sm text-black/70 dark:text-white/70">Learn programming, AI, and more</p>
-            </div>
-            <div className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-xl border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer">
+            </Link>
+            <Link
+              href="/academy"
+              className="bg-blue-50 dark:bg-blue-900/20 p-5 rounded-xl border border-blue-200 dark:border-blue-800 hover:shadow-md transition-all cursor-pointer"
+            >
               <div className="text-3xl mb-2">🎤</div>
               <h3 className="font-semibold mb-1 text-black dark:text-white">Industry Talks</h3>
               <p className="text-sm text-black/70 dark:text-white/70">Insights from industry leaders</p>
-            </div>
-            <div className="bg-orange-50 dark:bg-orange-900/20 p-5 rounded-xl border border-orange-200 dark:border-orange-800 hover:shadow-md transition-all cursor-pointer">
+            </Link>
+            <Link
+              href="/academy"
+              className="bg-orange-50 dark:bg-orange-900/20 p-5 rounded-xl border border-orange-200 dark:border-orange-800 hover:shadow-md transition-all cursor-pointer"
+            >
               <div className="text-3xl mb-2">🏆</div>
               <h3 className="font-semibold mb-1 text-black dark:text-white">Certifications</h3>
               <p className="text-sm text-black/70 dark:text-white/70">Get certified in your field</p>
-            </div>
+            </Link>
           </div>
 
           <div className="flex justify-center">
-            <button className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg">
-              Explore All Courses
-            </button>
+            <Link
+              href="/academy"
+              className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white font-semibold rounded-lg transition-all shadow-md hover:shadow-lg"
+            >
+              Explore
+            </Link>
           </div>
         </div>
 
