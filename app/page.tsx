@@ -201,9 +201,9 @@ export default function Home() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold mb-3">Level Up Daily</h3>
+              <h3 className="text-xl font-semibold mb-3">Apply & Connect</h3>
               <p className="text-sm leading-relaxed text-black/70 dark:text-white/70">
-                Complete AI-curated missions to build portfolio projects, learn in-demand skills, and earn career points.
+                Match with relevant roles and connect directly with top Malaysian employers.
               </p>
             </div>
           </li>
@@ -227,14 +227,14 @@ export default function Home() {
             },
             {
               quote:
-                "Career Missions gave me micro-tasks that actually mattered. I built 2 portfolio projects recruiters loved.",
+                "The Smart Job Matching connected me with roles I never knew existed. I got 3 interviews in my first week!",
               name: "Siti",
               title: "Software Developer",
               avatar: "S",
             },
             {
               quote:
-                "The Day-1 vs Next-step view changed everything. I finally understand where I&apos;m going, not just where I&apos;m starting.",
+                "The Company Insights feature completely changed how I research employers. It saves me hours of scrolling, and the culture and interview tabs give a real feel for what working there is like.",
               name: "Daniel",
               title: "Data Analyst",
               avatar: "D",
