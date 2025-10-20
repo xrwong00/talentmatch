@@ -8,13 +8,14 @@ import { MemoryVectorStore } from 'langchain/vectorstores/memory';
 const SYSTEM_PROMPT = `You are TalentMatch Career AI, a personalized virtual career mentor for fresh graduates and job seekers in Malaysia. Your role is to provide tailored, actionable career guidance based on each user's unique profile, skills, education, and career goals.
 
 Your capabilities include:
-1. **Career Path Guidance**: Analyze the user's background (education, skills, interests) to suggest suitable job roles, industries, or career progression steps
+1. **Career Path Guidance**: Analyze the user's background (education, skills, interests) to suggest suitable job roles with citations from the user's profile data, industries, or career progression steps
 2. **Skill Gap Analysis**: Identify missing or weak skills and recommend specific resources (courses, certifications) to bridge those gaps
 3. **Job Matching**: Cross-reference user profiles with available job opportunities to suggest personalized matches
 4. **Resume & Interview Support**: Provide feedback on resumes and offer interview preparation tips
 5. **Long-term Mentorship**: Maintain context across conversations to provide consistent, evolving guidance
 
 Guidelines:
+- When asked to suggest jobs, always refer to the user's profile data to give a reason why the user is suitable for the jobs
 - Reply in under 150 words.
 - Be encouraging, supportive, and professional
 - Provide specific, actionable advice rather than generic suggestions
@@ -23,11 +24,10 @@ Guidelines:
 - Recommend Malaysian-relevant resources and opportunities when applicable
 - Always consider the user's current situation and career stage
 - Be concise but thorough - aim for clarity over length
-- Use emojis sparingly and professionally (e.g., 🎯 for goals, 💡 for insights)
 - When recommending courses, prefer free options first (Coursera, edX, YouTube)
 - For skill gaps, prioritize the most impactful skills to learn first
 - Avoid markdown-style formatting symbols such as ** or ##. Bullets with a leading dash "- " are allowed when explicitly asked for lists.
-- Formatting rules: Prefer short sentences. For job suggestions, return ONLY a list of at most 3 bullet lines, each formatted exactly as: "- <Role> — <Company> (<Location | Type | Salary><optional: | Skills: a, b>) Apply: <URL>". No headings, no intros, no outros.
+- Formatting rules: Prefer short sentences. For job suggestions, return a list of at most 3 job suggestions and a reason why the user is suitable for the job, each formatted exactly as: "- <Role> — <Company> (<Location | Type | Salary><optional: | Skills: a, b>) Apply: <URL> Reason: <brief reason why the user is suitable for the job>". No headings, no intros, no outros.
 - Do not include learning recommendations unless the user asks for learning, courses, or how to improve.
 - When recommending specific jobs, always include the direct apply link if available. Present it inline at the end as: Apply: URL
 - When the user asks about weaknesses, areas for improvement, skill gaps, or how to improve, always include specific course suggestions from reputable platforms such as Coursera, edX, Udemy, or LinkedIn Learning with correct and clickable <URL>. Tie the recommendations to the user's goals when possible.
@@ -213,6 +213,71 @@ type SupabaseJobRow = {
   posted_at?: string | null;
   companies?: { name?: string | null; location?: string | null } | null;
 };
+
+// Build a brief, profile-based reason for why a job fits the user
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildReasonForJob(job: JobSummary, userContext: any): string {
+  const normalize = (v: unknown) => (typeof v === 'string' ? v.toLowerCase().trim() : '');
+
+  const userTerms = new Set<string>();
+
+  // Collect user skills
+  if (Array.isArray(userContext?.skills)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    userContext.skills.forEach((s: any) => {
+      const name = normalize(s?.name);
+      if (name) userTerms.add(name);
+    });
+  }
+
+  // Collect technologies from projects
+  if (Array.isArray(userContext?.projects)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    userContext.projects.forEach((p: any) => {
+      const techs = Array.isArray(p?.technologies)
+        ? p.technologies
+        : typeof p?.technologies === 'string'
+          ? p.technologies.split(/[,&|]/)
+          : [];
+      techs.forEach((t: unknown) => {
+        const name = normalize(t);
+        if (name) userTerms.add(name);
+      });
+    });
+  }
+
+  // Match job tags to user terms
+  const matchingTagsOriginal: string[] = [];
+  if (Array.isArray(job.tags)) {
+    job.tags.forEach((tag) => {
+      if (userTerms.has(normalize(tag))) {
+        matchingTagsOriginal.push(tag);
+      }
+    });
+  }
+
+  const reasons: string[] = [];
+  if (matchingTagsOriginal.length > 0) {
+    reasons.push(`matches your skills in ${matchingTagsOriginal.slice(0, 3).join(', ')}`);
+  }
+
+  const profileLocation = normalize(userContext?.profile?.location || userContext?.profile?.city);
+  const jobLocation = normalize(job.location);
+  if (profileLocation && jobLocation && jobLocation.includes(profileLocation)) {
+    reasons.push('aligns with your location');
+  }
+
+  const firstEdu = Array.isArray(userContext?.education) ? userContext.education[0] : undefined;
+  if (reasons.length === 0 && firstEdu?.field_of_study) {
+    reasons.push(`relevant to your ${firstEdu.field_of_study} background`);
+  }
+
+  if (reasons.length === 0) {
+    reasons.push('fits your background');
+  }
+
+  return reasons.join('; ');
+}
 
 // Helper to convert the structured user context into smaller embedding-friendly snippets
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -691,7 +756,8 @@ export async function POST(request: NextRequest) {
           const detailsText = details.length > 0 ? ` (${details.join(' | ')})` : '';
           const skills = job.tags && job.tags.length > 0 ? ` | Skills: ${job.tags.join(', ')}` : '';
           const external = job.externalLink ? ` | External: ${job.externalLink}` : '';
-          return `- ${job.title} — ${job.company}${detailsText}${skills}. Apply: ${job.jobLink}${external}`;
+          const reason = buildReasonForJob(job, userContext);
+          return `- ${job.title} — ${job.company}${detailsText}${skills}. Apply: ${job.jobLink}${external} Reason: ${reason}`;
         })
         .join('\n');
       assistantMessage = list || ' - No suitable roles found right now.';
