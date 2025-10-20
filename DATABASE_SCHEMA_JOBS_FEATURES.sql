@@ -98,3 +98,6 @@ create index if not exists idx_job_applications_status on public.job_application
 create index if not exists idx_saved_jobs_user_id on public.saved_jobs(user_id);
 create index if not exists idx_saved_jobs_job_id on public.saved_jobs(job_id);
 
+
+
+

@@ -12,3 +12,6 @@ ADD CONSTRAINT jobs_apply_url_unique UNIQUE (apply_url);
 -- ALTER TABLE public.jobs
 -- ADD CONSTRAINT jobs_company_title_location_unique UNIQUE (company_id, title, location);
 
+
+
+

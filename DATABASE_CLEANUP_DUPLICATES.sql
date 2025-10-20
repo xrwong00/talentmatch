@@ -43,3 +43,6 @@ FROM public.jobs j
 LEFT JOIN public.companies c ON c.id = j.company_id
 ORDER BY j.posted_at DESC;
 
+
+
+
