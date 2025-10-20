@@ -8,6 +8,7 @@ import { useAuth } from "@/app/contexts/AuthContext";
 import { createClient } from "@/lib/supabase/client";
 import CareerDiscoveryModal from "@/app/components/CareerDiscoveryModal";
 import CareerAgentChat from "@/app/components/CareerAgentChat";
+import AIInterviewCoach from "@/app/components/AIInterviewCoach";
 
 type Job = {
   id: string;
@@ -34,6 +35,7 @@ export default function Dashboard() {
   const [profile, setProfile] = useState<any>(null);
   const [showCareerModal, setShowCareerModal] = useState(false);
   const [showAIAgent, setShowAIAgent] = useState(false);
+  const [showInterviewCoach, setShowInterviewCoach] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
   const [savedJobIds, setSavedJobIds] = useState<Set<string>>(new Set());
   const [appliedJobIds, setAppliedJobIds] = useState<Set<string>>(new Set());
@@ -212,6 +214,12 @@ export default function Dashboard() {
             <span className="text-lg font-semibold">TalentMatch</span>
           </div>
           <div className="flex items-center gap-6">
+            <button
+              onClick={() => setShowInterviewCoach(true)}
+              className="text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg hidden sm:block"
+            >
+              AI Interview Coach
+            </button>
             <Link
               href="/mentor"
               className="text-sm font-medium text-white bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 px-4 py-2 rounded-lg transition-all shadow-md hover:shadow-lg hidden sm:block"
@@ -615,6 +623,10 @@ export default function Dashboard() {
       {/* AI Career Agent Modal */}
       {showAIAgent && (
         <CareerAgentChat onClose={() => setShowAIAgent(false)} />
+      )}
+      {/* AI Interview Coach Modal */}
+      {showInterviewCoach && (
+        <AIInterviewCoach onClose={() => setShowInterviewCoach(false)} />
       )}
     </div>
   );

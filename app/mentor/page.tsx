@@ -48,7 +48,7 @@ export default function MentorPage() {
       title: "Head of AI Research",
       company: "Google Asia Pacific",
       industry: "Technology",
-      expertise: ["Machine Learning", "AI", "Data Science", "Research"],
+      expertise: ["Machine Learning", "AI", "Data Science", "Deep Learning"],
       experience: "12+ years",
       availability: "Available",
       rating: 4.8,

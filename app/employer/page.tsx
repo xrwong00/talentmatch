@@ -56,7 +56,7 @@ export default function EmployerPage() {
           </Link>
           <div className="flex items-center gap-4">
             <Link href="/" className="text-sm font-medium hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
-              For Job Seekers
+              For Students & Graduates
             </Link>
             {loading || authLoading ? (
               <div className="w-20 h-9 rounded-full bg-gray-200 dark:bg-gray-700 animate-pulse"></div>
